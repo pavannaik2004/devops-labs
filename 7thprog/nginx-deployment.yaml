@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 2 # run 2 copies (pods) of nginx
+  selector:
+    matchLabels:
+      app: nginx # manage pods that have the label app=nginx
+  template: # blueprint for each pod
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          imagePullPolicy: IfNotPresent # use the local image if it's already there
+          ports:
+            - containerPort: 80
+              protocol: TCP
