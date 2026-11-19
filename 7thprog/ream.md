@@ -25,15 +25,18 @@ kubectl get replicasets # → "No resources found"
 kubectl get pods
 
 kubectl apply -f nginx-deployment.yaml # create the Deployment from the file
+kubectl apply -f nginx-deployment.yaml
 
 kubectl get deployments # nginx-deployment 2/2 ready
 kubectl get replicasets # the ReplicaSet that keeps 2 pods running
 kubectl get pods # 2 nginx pods, both Running
 
 kubectl expose deployment nginx-deployment
---type=NodePort -
--port=80
+--type=NodePort --port=80
 
+minikube service nginx-deployment
+
+kubectl delete pods --all
 kubectl delete service nginx-deployment # remove the old service
 kubectl expose deployment nginx-deployment --type=NodePort --port=80 # re-run, now "exposed"
 
