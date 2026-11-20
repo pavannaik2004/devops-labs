@@ -6,15 +6,15 @@ This program runs **2 copies of the Nginx web server** on a local Kubernetes clu
 
 ## Key terms
 
-| Term | What it is |
-|---|---|
-| **Minikube** | Runs a single-node Kubernetes cluster on your own machine (inside Docker). |
-| **kubectl** | Command-line tool used to talk to the Kubernetes cluster. |
-| **Pod** | The smallest unit in Kubernetes. It wraps one or more running containers (here, one nginx container). |
-| **ReplicaSet** | Keeps a fixed number of identical pods running. If a pod dies, it starts a new one. |
-| **Deployment** | Manages ReplicaSets. You describe *what* you want (image, number of copies), and it makes it happen. |
-| **Service** | Gives a set of pods one stable address and load-balances traffic between them. |
-| **NodePort** | A Service type that opens a port (30000–32767) on the node so you can reach the app from outside the cluster. |
+| Term           | What it is                                                                                                    |
+| -------------- | ------------------------------------------------------------------------------------------------------------- |
+| **Minikube**   | Runs a single-node Kubernetes cluster on your own machine (inside Docker).                                    |
+| **kubectl**    | Command-line tool used to talk to the Kubernetes cluster.                                                     |
+| **Pod**        | The smallest unit in Kubernetes. It wraps one or more running containers (here, one nginx container).         |
+| **ReplicaSet** | Keeps a fixed number of identical pods running. If a pod dies, it starts a new one.                           |
+| **Deployment** | Manages ReplicaSets. You describe _what_ you want (image, number of copies), and it makes it happen.          |
+| **Service**    | Gives a set of pods one stable address and load-balances traffic between them.                                |
+| **NodePort**   | A Service type that opens a port (30000–32767) on the node so you can reach the app from outside the cluster. |
 
 **Flow:** `Deployment` → creates a `ReplicaSet` → creates `Pods` ← `Service` sends traffic to them using **labels** (`app: nginx`)
 
@@ -50,17 +50,17 @@ kubectl create service nodeport nginx-service \
   --dry-run=client -o yaml > gen-service.yaml
 ```
 
-| Part | Meaning |
-|---|---|
-| `create deployment nginx-deployment` | Make a Deployment named `nginx-deployment` |
-| `--image=nginx:latest` | Container image to run |
-| `--replicas=2` | Run 2 pods |
-| `--port=80` | Port the container listens on |
-| `create service nodeport nginx-service` | Make a NodePort Service named `nginx-service` |
-| `--tcp=80:80` | `service port : container (target) port` |
-| `--node-port=30080` | Fixed outside port (must be 30000–32767) |
-| `--dry-run=client` | **Don't create anything in the cluster**, only show what would be created |
-| `-o yaml > file.yaml` | Save that output as a YAML file |
+| Part                                    | Meaning                                                                   |
+| --------------------------------------- | ------------------------------------------------------------------------- |
+| `create deployment nginx-deployment`    | Make a Deployment named `nginx-deployment`                                |
+| `--image=nginx:latest`                  | Container image to run                                                    |
+| `--replicas=2`                          | Run 2 pods                                                                |
+| `--port=80`                             | Port the container listens on                                             |
+| `create service nodeport nginx-service` | Make a NodePort Service named `nginx-service`                             |
+| `--tcp=80:80`                           | `service port : container (target) port`                                  |
+| `--node-port=30080`                     | Fixed outside port (must be 30000–32767)                                  |
+| `--dry-run=client`                      | **Don't create anything in the cluster**, only show what would be created |
+| `-o yaml > file.yaml`                   | Save that output as a YAML file                                           |
 
 > ⚠️ **Note:** The generated files use different labels (`app: nginx-deployment` and `app: nginx-service`). A Service only sends traffic to pods whose labels match its `selector`, so these two **won't work together** as-is. The ready-made files below are already fixed. Only use the `gen-*.yaml` files after changing every label/selector to `app: nginx`.
 >
@@ -80,11 +80,11 @@ metadata:
   labels:
     app: nginx
 spec:
-  replicas: 2                       # run 2 copies (pods) of nginx
+  replicas: 2 # run 2 copies (pods) of nginx
   selector:
     matchLabels:
-      app: nginx                    # manage pods that have the label app=nginx
-  template:                         # blueprint for each pod
+      app: nginx # manage pods that have the label app=nginx
+  template: # blueprint for each pod
     metadata:
       labels:
         app: nginx
@@ -92,7 +92,7 @@ spec:
       containers:
         - name: nginx
           image: nginx:latest
-          imagePullPolicy: IfNotPresent   # use the local image if it's already there
+          imagePullPolicy: IfNotPresent # use the local image if it's already there
           ports:
             - containerPort: 80
               protocol: TCP
@@ -108,15 +108,15 @@ metadata:
   labels:
     app: nginx
 spec:
-  type: NodePort          # expose the service on a port of the node
+  type: NodePort # expose the service on a port of the node
   selector:
-    app: nginx            # send traffic to pods labelled app=nginx (must match the deployment)
+    app: nginx # send traffic to pods labelled app=nginx (must match the deployment)
   ports:
     - name: 80-80
       protocol: TCP
-      port: 80            # port of the service inside the cluster
-      targetPort: 80      # containerPort of the nginx pods
-      nodePort: 30080     # port opened on the Minikube node
+      port: 80 # port of the service inside the cluster
+      targetPort: 80 # containerPort of the nginx pods
+      nodePort: 30080 # port opened on the Minikube node
 ```
 
 ---
@@ -220,21 +220,6 @@ Shows the Service and its ports → `nginx-service   NodePort   80:30080/TCP`
 
 ## Step 6 – Open the app in the browser
 
-### Option A – Use the Service from `nginx-service.yaml` (recommended)
-
-```bash
-minikube service nginx-service
-```
-
-Prints the URL (for example `http://192.168.49.2:30080`) and opens it in the browser.
-To only print the URL:
-
-```bash
-minikube service nginx-service --url
-```
-
-### Option B – Lab manual method (`kubectl expose`)
-
 Creates a NodePort Service automatically from the Deployment. It copies the Deployment's selector, so the labels always match.
 
 ```bash
@@ -293,22 +278,22 @@ minikube stop
 
 ## Quick reference
 
-| Command | What it does |
-|---|---|
-| `minikube start` | Start the local cluster |
-| `minikube status` | Check the cluster is running |
-| `minikube ip` | Show the cluster's IP address |
-| `kubectl apply -f <file>` | Create/update resources from a YAML file |
-| `kubectl get deployments` | List Deployments |
-| `kubectl get replicasets` | List ReplicaSets |
-| `kubectl get pods` | List Pods |
-| `kubectl get services` | List Services and their ports |
-| `kubectl expose deployment <name> --type=NodePort --port=80` | Create a Service for a Deployment |
-| `minikube service <service-name>` | Open a Service in the browser |
-| `kubectl delete -f <file>` | Delete resources defined in a YAML file |
-| `kubectl delete svc --all` | Delete all Services |
-| `kubectl delete deployments --all` | Delete all Deployments (and their pods) |
-| `minikube stop` | Stop the cluster |
+| Command                                                      | What it does                             |
+| ------------------------------------------------------------ | ---------------------------------------- |
+| `minikube start`                                             | Start the local cluster                  |
+| `minikube status`                                            | Check the cluster is running             |
+| `minikube ip`                                                | Show the cluster's IP address            |
+| `kubectl apply -f <file>`                                    | Create/update resources from a YAML file |
+| `kubectl get deployments`                                    | List Deployments                         |
+| `kubectl get replicasets`                                    | List ReplicaSets                         |
+| `kubectl get pods`                                           | List Pods                                |
+| `kubectl get services`                                       | List Services and their ports            |
+| `kubectl expose deployment <name> --type=NodePort --port=80` | Create a Service for a Deployment        |
+| `minikube service <service-name>`                            | Open a Service in the browser            |
+| `kubectl delete -f <file>`                                   | Delete resources defined in a YAML file  |
+| `kubectl delete svc --all`                                   | Delete all Services                      |
+| `kubectl delete deployments --all`                           | Delete all Deployments (and their pods)  |
+| `minikube stop`                                              | Stop the cluster                         |
 
 ---
 
