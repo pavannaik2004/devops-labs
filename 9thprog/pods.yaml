@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: frontend-pod
+  namespace: dev
+  labels:
+    app: frontend
+    env: dev
+spec:
+  containers:
+    - name: frontend
+      image: nginx
+      ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: backend-pod
+  namespace: dev
+  labels:
+    app: backend
+    env: dev
+spec:
+  containers:
+    - name: backend
+      image: nginx
+      ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: frontend-pod
+  namespace: prod
+  labels:
+    app: frontend
+    env: prod
+spec:
+  containers:
+    - name: frontend
+      image: nginx
+      ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: backend-pod
+  namespace: prod
+  labels:
+    app: backend
+    env: prod
+spec:
+  containers:
+    - name: backend
+      image: nginx
+      ports:
+        - containerPort: 80
